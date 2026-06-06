@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Surprise For You!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Poppins:wght@300;400&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffe6e6; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Tulips background decoration */
+        .floating-tulips {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.7;
+            user-select: none;
+            z-index: 0;
+        }
+        .t1 { top: 10%; left: 15%; animation: float 3s ease-in-out infinite; }
+        .t2 { top: 20%; right: 20%; animation: float 4s ease-in-out infinite reverse; }
+        .t3 { bottom: 15%; left: 25%; animation: float 3.5s ease-in-out infinite; }
+        .t4 { bottom: 25%; right: 15%; animation: float 4.5s ease-in-out infinite reverse; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Envelope Container */
+        .envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #ff8ca3; 
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Front of the envelope (The Pocket) */
+        .front {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid #ff9db2;
+            border-right: 150px solid #ff9db2;
+            border-bottom: 100px solid #ff7a95;
+            border-top: 100px solid transparent;
+            z-index: 3;
+            border-radius: 0 0 10px 10px;
+            pointer-events: none;
+        }
+
+        /* Flap of the envelope */
+        .flap {
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #ff7a95;
+            z-index: 4;
+            transform-origin: top;
+            /* Delayed closing so it waits for the letter to go back inside */
+            transition: transform 0.6s ease 0.4s, z-index 0.6s 0.4s;
+            pointer-events: none;
+        }
+
+        /* The Letter Inside */
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 280px;
+            height: 180px;
+            background-color: #fffafb;
+            border-radius: 10px;
+            z-index: 2;
+            /* Instant z-index change on close so it drops behind the pocket immediately */
+            transition: transform 0.8s ease, height 0.8s ease, z-index 0s 0s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow: hidden; 
+        }
+
+        /* Replaceable Photo Placeholder */
+        .photo-container {
+            width: 120px;
+            height: 120px;
+            background-color: #eee;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 3px solid #ff8ca3;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Sweet Text Styling */
+        .sweet-text {
+            font-family: 'Caveat', cursive;
+            font-size: 1.5rem;
+            color: #d14764;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .click-me {
+            position: absolute;
+            bottom: -40px;
+            width: 100%;
+            text-align: center;
+            color: #ff476e;
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* --- OPEN ANIMATIONS --- */
+        
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1; 
+            /* Opens immediately */
+            transition: transform 0.6s ease 0s, z-index 0.6s 0s;
+        }
+
+        .envelope-wrapper.open .letter {
+            height: 380px; 
+            transform: translateY(-150px); /* Slides it perfectly to the center of the screen */
+            z-index: 5; /* Brings it entirely to the FRONT of the envelope pocket */
+            /* Delayed z-index so it slides out a bit before popping to the front */
+            transition: transform 0.8s ease, height 0.8s ease, z-index 0s 0.4s; 
+        }
+        
+        .envelope-wrapper.open .click-me {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="floating-tulips t1">🌷</div>
+    <div class="floating-tulips t2">🌷</div>
+    <div class="floating-tulips t3">🌷</div>
+    <div class="floating-tulips t4">🌷</div>
+
+    <div class="envelope-wrapper" id="envelope" onclick="openEnvelope()">
+        <div class="envelope">
+            <div class="flap"></div>
+            <div class="letter">
+                
+                <div class="photo-container">
+                    <img src="Image_1.jpg" alt="Our Picture">
+                </div>
+
+                <div class="sweet-text">
+                    HAPPY 30TH MONTHSARY MYLOVE! <br>
+                     I just want to say to you that I'm so lucky to have you, and I'm very thankful because I have you. I love you always mwaa mwaaa!<br>
+                </div>
+
+            </div>
+            <div class="front"></div>
+        </div>
+        <div class="click-me">Tap the envelope!</div>
+    </div>
+
+    <script>
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            envelope.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
